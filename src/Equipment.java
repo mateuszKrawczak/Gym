@@ -2,7 +2,7 @@ import javax.swing.*;
 
 public class Equipment {
 
-    private String name;
+    public String name;
 
     private Bodybuilder user;
 
