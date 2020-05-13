@@ -49,6 +49,8 @@ public class Window extends JFrame {
     ArrayList<Equipment> equipmentsArms = new ArrayList<>();
     ArrayList<Equipment> equipmentsBurnFat = new ArrayList<>();
     ArrayList<Equipment> equipmentsTop = new ArrayList<>();
+    ArrayList<Equipment> equipmentsLegs = new ArrayList<>();
+
     public Window() {
         init();
         initEquipmentsLists();
@@ -117,20 +119,21 @@ public class Window extends JFrame {
         secondRoom.add(legsTrainingStatus);
         secondRoom.add(cardioTrainingStatus);
 
+
         add(buttonTrain);
         add(buttonSwitchRoom);
         add(scroll);
 
         hall.setBounds(0,0,300,1000);
-        hall.setBackground(Color.red);
+        hall.setBackground(new Color(224, 220, 184));
         hall.setLayout(null);
 
         firstRoom.setBounds(300,0,1000,1000);
-        firstRoom.setBackground(Color.blue);
+        firstRoom.setBackground(new Color(186, 69, 65));
         firstRoom.setLayout(null);
 
         secondRoom.setBounds(300,0,1000,1000);
-        secondRoom.setBackground(Color.yellow);
+        secondRoom.setBackground(new Color(168, 123, 0));
         secondRoom.setLayout(null);
 
         add(hall);
@@ -144,8 +147,8 @@ public class Window extends JFrame {
         equipmentsTop.add(backEquipment);
         equipmentsArms.add(bicepsEquipment);
         equipmentsArms.add(tricepsEquipment);
-
-
+        equipmentsBurnFat.add(cardioEquipment);
+        equipmentsLegs.add(legsEquipment);
     }
     void changeRoom(){
         if(secondRoom.isVisible()){
@@ -167,10 +170,11 @@ public class Window extends JFrame {
             bodybuilders.add(new Bodybuilder(output, equipmentsTop, TrainingPlan.TOP_TRAINING));
             bodybuilders.add(new Bodybuilder(output, equipmentsTop, TrainingPlan.TOP_TRAINING));
             bodybuilders.add(new Bodybuilder(output, equipmentsArms, TrainingPlan.ARMS_TRAINING));
-
+        bodybuilders.add(new Bodybuilder(output, equipmentsLegs, TrainingPlan.LEGS_TRAINING));
+        bodybuilders.add(new Bodybuilder(output, equipmentsBurnFat, TrainingPlan.CARDIO_TRAINING));
        // }
 
-        for (int i = 0; i < 3; i++){
+        for (int i = 0; i < 5; i++){
             bodybuilders.get(i).start();
         }
 

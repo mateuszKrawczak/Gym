@@ -13,6 +13,8 @@ public class Bodybuilder extends Thread{
     private boolean chestFinished = false;
     private boolean tricepsFinished = false;
     private boolean bicepsFinished = false;
+    private boolean legsFinished = false;
+    private boolean cardioFinished = false;
 
     ArrayList<Equipment> training = new ArrayList<Equipment>();
 
@@ -144,8 +146,22 @@ public class Bodybuilder extends Thread{
                            chestTraining();
                        }
                        break;
+                   case CARDIO_TRAINING:
+                       sleep((int) (Math.random() * 1000) + 1000);
+                       if (cardioEquipment.isAvailable()) {
+                           cardioTraining();
+                       }
 
 
+                       break;
+                   case LEGS_TRAINING:
+                       sleep((int) (Math.random() * 1000) + 1000);
+                       if (legsEquipment.isAvailable()) {
+                           legsTraining();
+                       }
+
+
+                       break;
 
                }
 
@@ -211,7 +227,22 @@ public class Bodybuilder extends Thread{
         backEquipment.removeUser();
         output.append("\nClient " + idNumber + " has finished back training");
     }
-
+    public synchronized void cardioTraining(){
+        output.append("\nClient " + idNumber + " has started cardio training");
+        cardioEquipment.setUser(this);
+        sleep(3000);
+        cardioFinished = true;
+        cardioEquipment.removeUser();
+        output.append("\nClient " + idNumber + " has finished cardio training");
+    }
+    public synchronized void legsTraining(){
+        output.append("\nClient " + idNumber + " has started legs training");
+        legsEquipment.setUser(this);
+        sleep(3000);
+        legsFinished = true;
+        legsEquipment.removeUser();
+        output.append("\nClient " + idNumber + " has finished legs training");
+    }
     public synchronized void toilet() {
         output.append("\nClient " + idNumber + " is using toilet");
     }
