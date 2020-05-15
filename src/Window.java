@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 public class Window extends JFrame {
 
-
-
     JButton buttonTrain = new JButton("Train!");
     JButton buttonSwitchRoom = new JButton("Switch Room");
 
@@ -15,7 +13,7 @@ public class Window extends JFrame {
     JPanel secondRoom =new JPanel();
 
     JLabel labelReception = new JLabel("Reception");
-    JLabel labelDressingRoom = new JLabel("Dressing room");
+    JLabel labelChangingRoom = new JLabel("Changing room");
     JLabel labelToilet = new JLabel("Toilet");
     JLabel labelChestTraining = new JLabel("Chest training");
     JLabel labelBackTraining = new JLabel("Back training");
@@ -24,8 +22,8 @@ public class Window extends JFrame {
     JLabel labelLegsTraining = new JLabel("Legs training");
     JLabel labelCardioTraining = new JLabel("Cardio training");
 
-    JLabel receptionStatus = new JLabel("Free");
-    JLabel dressingRoomStatus = new JLabel("Free");
+    JTextArea receptionStatus = new JTextArea("Free");
+    JTextArea changingRoomStatus = new JTextArea("Free");
     JLabel toiletStatus = new JLabel("Free");
     JLabel chestTrainingStatus = new JLabel("Free");
     JLabel backTrainingStatus = new JLabel("Free");
@@ -44,7 +42,10 @@ public class Window extends JFrame {
     Equipment legsEquipment = new Equipment("Legs Equipment", legsTrainingStatus);
     Equipment cardioEquipment = new Equipment("Cardio Equipment", cardioTrainingStatus);
 
+    ChangingRoom changingRoom;
+    Reception reception;
 
+    ArrayList<Receptionist> receptionists = new ArrayList<>();
     ArrayList<Bodybuilder> bodybuilders = new ArrayList<>();
     ArrayList<Equipment> equipmentsArms = new ArrayList<>();
     ArrayList<Equipment> equipmentsBurnFat = new ArrayList<>();
@@ -74,7 +75,7 @@ public class Window extends JFrame {
         buttonSwitchRoom.setBounds(5, 40, 150, 25);
         buttonSwitchRoom.addActionListener((e) -> changeRoom());
         labelReception.setBounds(100, 200, 100, 25);
-        labelDressingRoom.setBounds(100, 400, 100, 25);
+        labelChangingRoom.setBounds(100, 400, 100, 25);
         labelToilet.setBounds(100, 800, 100, 25);
         labelChestTraining.setBounds(200, 400, 100, 25);
         labelBackTraining.setBounds(500, 400, 100, 25);
@@ -83,8 +84,8 @@ public class Window extends JFrame {
         labelLegsTraining.setBounds(500, 800, 100, 25);
         labelCardioTraining.setBounds(200, 800, 100, 25);
 
-        receptionStatus.setBounds(100, 230, 250, 25);
-        dressingRoomStatus.setBounds(100, 430, 250, 25);
+        receptionStatus.setBounds(100, 230, 175, 150);
+        changingRoomStatus.setBounds(100, 430, 175, 100);
         toiletStatus.setBounds(100, 830, 250, 25);
         chestTrainingStatus.setBounds(200, 430, 250, 25);
         backTrainingStatus.setBounds(500, 430, 250, 25);
@@ -96,7 +97,7 @@ public class Window extends JFrame {
         scroll.setBounds(1300, 25,250, 900);
 
         hall.add(labelReception);
-        hall.add(labelDressingRoom);
+        hall.add(labelChangingRoom);
         hall.add(labelToilet);
 
         firstRoom.add(labelChestTraining);
@@ -108,7 +109,7 @@ public class Window extends JFrame {
         secondRoom.add(labelCardioTraining);
 
         hall.add(receptionStatus);
-        hall.add(dressingRoomStatus);
+        hall.add(changingRoomStatus);
         hall.add(toiletStatus);
 
         firstRoom.add(chestTrainingStatus);
@@ -163,18 +164,26 @@ public class Window extends JFrame {
 
     void train(){
 
+        changingRoom = new ChangingRoom(3, changingRoomStatus);
+        reception = new Reception(receptionStatus);
+
         buttonTrain.setEnabled(false);
 
-        //for (int i = 0; i < 3; i++){
-            //
-            bodybuilders.add(new Bodybuilder(output, equipmentsTop, TrainingPlan.TOP_TRAINING));
-            bodybuilders.add(new Bodybuilder(output, equipmentsTop, TrainingPlan.TOP_TRAINING));
-            bodybuilders.add(new Bodybuilder(output, equipmentsArms, TrainingPlan.ARMS_TRAINING));
-        bodybuilders.add(new Bodybuilder(output, equipmentsLegs, TrainingPlan.LEGS_TRAINING));
-        bodybuilders.add(new Bodybuilder(output, equipmentsBurnFat, TrainingPlan.CARDIO_TRAINING));
-       // }
+        for(int i=0;i<2;i++){
+            receptionists.add(new Receptionist(output, reception));
+        }
 
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 2; i++){
+            receptionists.get(i).start();
+        }
+
+        bodybuilders.add(new Bodybuilder(output, equipmentsTop, changingRoom, TrainingPlan.TOP_TRAINING, reception));
+        //bodybuilders.add(new Bodybuilder(output, equipmentsTop, changingRoom, TrainingPlan.TOP_TRAINING, reception));
+        bodybuilders.add(new Bodybuilder(output, equipmentsArms, changingRoom, TrainingPlan.ARMS_TRAINING, reception));
+        bodybuilders.add(new Bodybuilder(output, equipmentsLegs, changingRoom, TrainingPlan.LEGS_TRAINING, reception));
+        bodybuilders.add(new Bodybuilder(output, equipmentsBurnFat, changingRoom, TrainingPlan.CARDIO_TRAINING, reception));
+
+        for (int i = 0; i < 4; i++){
             bodybuilders.get(i).start();
         }
 

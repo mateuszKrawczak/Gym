@@ -15,6 +15,9 @@ public class Bodybuilder extends Thread{
     private boolean bicepsFinished = false;
     private boolean legsFinished = false;
     private boolean cardioFinished = false;
+    private boolean clothesChanged = false;
+    private boolean toiletVisited = false;
+    private boolean keyOwnership = false;
 
     ArrayList<Equipment> training = new ArrayList<Equipment>();
 
@@ -27,22 +30,17 @@ public class Bodybuilder extends Thread{
     JTextArea output;
 
     private TrainingPlan trainingMode;
+    private ChangingRoom changingRoom;
+    private Reception reception;
 
-    Bodybuilder(JTextArea output, Equipment backEquipment, Equipment chestEquipment){
+    Bodybuilder(JTextArea output, ArrayList<Equipment> training, ChangingRoom changingRoom,
+            TrainingPlan trainingMode, Reception reception)
+    {
         this.idNumber = ++ID;
         this.output = output;
-
-        this.backEquipment = backEquipment;
-        this.chestEquipment = chestEquipment;
-    }
-    Bodybuilder(){
-        this.idNumber = ++ID;
-    }
-    Bodybuilder(JTextArea output, ArrayList<Equipment> training,TrainingPlan trainingMode){
-        this.idNumber = ++ID;
-        this.output = output;
-
+        this.changingRoom = changingRoom;
         this.trainingMode = trainingMode;
+        this.reception = reception;
         for(int i=0;i<training.size();i++){
             Equipment equipment = training.get(i);
             System.out.println(equipment.name.toString());
@@ -70,59 +68,23 @@ public class Bodybuilder extends Thread{
 
     }
 
-   /* @Override
-    public void run(){
-        while(running){
-            sleep((int)(Math.random() * 1000) + 2000);
-            entry();
-            sleep((int)(Math.random() * 1000) + 2000);
-            collectLockerKey();
-            sleep((int)(Math.random() * 1000) + 2000);
-            changeClothes();
-            while(isWorkoutFinished() == false){
-
-                sleep((int)(Math.random() * 1000) + 1000);
-                if(backEquipment.isAvailable()){
-                    backTraining();
-                }
-
-                sleep((int)(Math.random() * 1000) + 1000);
-                if(chestEquipment.isAvailable()){
-                    chestTraining();
-                }
-
-                sleep((int)(Math.random() * 1000) + 1000);
-                if(tricepsEquipment.isAvailable()){
-                    tricepsTraining();
-                }
-
-
-                sleep((int)(Math.random() * 1000) + 1000);
-                if(bicepsEquipment.isAvailable()){
-                    bicepsTraining();
-                }
-
-
-            }
-            sleep((int)(Math.random() * 1000) + 2000);
-            toilet();
-            sleep((int)(Math.random() * 1000) + 2000);
-            changeClothes();
-            sleep((int)(Math.random() * 1000) + 2000);
-            returnLockerKey();
-            sleep((int)(Math.random() * 1000) + 2000);
-            exit();
-        }
-    }*/
    @Override
    public void run(){
        while(running){
            sleep((int)(Math.random() * 1000) + 2000);
            entry();
            sleep((int)(Math.random() * 1000) + 2000);
-           collectLockerKey();
+           while(keyOwnership == false){
+               sleep((int)(Math.random() * 1000) + 2000);
+           }
            sleep((int)(Math.random() * 1000) + 2000);
-           changeClothes();
+           while(clothesChanged == false){
+               if(changingRoom.isAvailable()){
+                   changeClothes(true);
+               }
+               sleep((int) (Math.random() * 1000) + 1000);
+           }
+           sleep((int)(Math.random() * 1000) + 2000);
            while(isWorkoutFinished() == false){
                switch(trainingMode) {
                    case ARMS_TRAINING:
@@ -169,15 +131,26 @@ public class Bodybuilder extends Thread{
            sleep((int)(Math.random() * 1000) + 2000);
            toilet();
            sleep((int)(Math.random() * 1000) + 2000);
-           changeClothes();
+           while(clothesChanged == true){
+               if(changingRoom.isAvailable()){
+                   changeClothes(false);
+               }
+               sleep((int) (Math.random() * 1000) + 1000);
+           }
            sleep((int)(Math.random() * 1000) + 2000);
-           returnLockerKey();
+           entry();
+           sleep((int)(Math.random() * 1000) + 2000);
+           while(keyOwnership == true){
+               sleep((int)(Math.random() * 1000) + 2000);
+           }
            sleep((int)(Math.random() * 1000) + 2000);
            exit();
        }
    }
+
     public synchronized void entry() {
-        output.append("\nClient " + idNumber + " entered the gym");
+        reception.comeToReception(this);
+        output.append("\nClient " + idNumber + " has approached reception");
     }
 
     public synchronized void collectLockerKey(){
@@ -188,8 +161,13 @@ public class Bodybuilder extends Thread{
         output.append("\nClient " + idNumber + " has returned key to the locker");
     }
 
-    public synchronized void changeClothes() {
-        output.append("\nClient " + idNumber + " is changing clothes");
+    public synchronized void changeClothes(boolean status) {
+       changingRoom.useChangingRoom(this);
+       output.append("\nClient " + idNumber + " has entered changing room");
+       sleep(3000);
+       clothesChanged = status;
+       changingRoom.exitChangingRoom(this);
+       output.append("\nClient " + idNumber + " has left changing room");
     }
 
     public synchronized void bicepsTraining(){
@@ -252,12 +230,33 @@ public class Bodybuilder extends Thread{
         running = false;
     }
 
+    public void setKeyOwnership(){
+       this.keyOwnership = !this.keyOwnership;
+    }
+
+    public boolean getKeyOwnership(){
+       return this.keyOwnership;
+    }
+
     public boolean isWorkoutFinished(){
-        if(!backFinished) return false;
-        if(!bicepsFinished) return false;
-        if(!tricepsFinished) return false;
-        if(!chestFinished) return false;
-        return true;
+        switch(trainingMode){
+            case TOP_TRAINING:
+                if(!chestFinished) return false;
+                if(!backFinished) return false;
+                return true;
+            case ARMS_TRAINING:
+                if(!bicepsFinished) return false;
+                if(!tricepsFinished) return false;
+                return true;
+            case LEGS_TRAINING:
+                if(!legsFinished) return false;
+                return true;
+            case CARDIO_TRAINING:
+                if(!cardioFinished) return false;
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void sleep(int timeOut) {
