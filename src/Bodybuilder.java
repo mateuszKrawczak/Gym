@@ -15,6 +15,8 @@ public class Bodybuilder extends Thread{
     private boolean bicepsFinished = false;
     private boolean legsFinished = false;
     private boolean cardioFinished = false;
+    private boolean deadliftFinished = false;
+    private boolean chalisthenicsFinished = false;
     private boolean clothesChanged = false;
     private boolean toiletVisited = false;
     private boolean keyOwnership = false;
@@ -27,20 +29,25 @@ public class Bodybuilder extends Thread{
     private Equipment tricepsEquipment;
     private Equipment legsEquipment ;
     private Equipment cardioEquipment;
+    private Equipment deadliftEquipment ;
+    private Equipment chalisthenicsEquipment;
+
     JTextArea output;
 
     private TrainingPlan trainingMode;
     private ChangingRoom changingRoom;
     private Reception reception;
+    private Toilet toilet;
 
     Bodybuilder(JTextArea output, ArrayList<Equipment> training, ChangingRoom changingRoom,
-            TrainingPlan trainingMode, Reception reception)
+            TrainingPlan trainingMode, Reception reception, Toilet toilet)
     {
         this.idNumber = ++ID;
         this.output = output;
         this.changingRoom = changingRoom;
         this.trainingMode = trainingMode;
         this.reception = reception;
+        this.toilet = toilet;
         for(int i=0;i<training.size();i++){
             Equipment equipment = training.get(i);
             System.out.println(equipment.name.toString());
@@ -62,6 +69,12 @@ public class Bodybuilder extends Thread{
                     break;
                 case "Cardio Equipment":
                     this.cardioEquipment = equipment;
+                    break;
+                case "Deadlift Equipment":
+                    this.deadliftEquipment = equipment;
+                    break;
+                case "Chalisthenics Equipment":
+                    this.chalisthenicsEquipment = equipment;
                     break;
             }
         }
@@ -124,12 +137,30 @@ public class Bodybuilder extends Thread{
 
 
                        break;
+                   case DEADLIFT_TRAINING:
+                       sleep((int) (Math.random() * 1000) + 1000);
+                       if (deadliftEquipment.isAvailable()) {
+                           deadliftTraining();
+                       }
+
+
+                       break;
+                   case CHALISTHENICS_TRAINING:
+                       sleep((int) (Math.random() * 1000) + 1000);
+                       if (chalisthenicsEquipment.isAvailable()) {
+                           chalisthenicsTraining();
+                       }
+
+
+                       break;
 
                }
 
            }
            sleep((int)(Math.random() * 1000) + 2000);
-           toilet();
+           if (toilet.isAvailable()) {
+               toilet();
+           }
            sleep((int)(Math.random() * 1000) + 2000);
            while(clothesChanged == true){
                if(changingRoom.isAvailable()){
@@ -221,8 +252,30 @@ public class Bodybuilder extends Thread{
         legsEquipment.removeUser();
         output.append("\nClient " + idNumber + " has finished legs training");
     }
+    public synchronized void deadliftTraining(){
+        output.append("\nClient " + idNumber + " has started deadlift training");
+        deadliftEquipment.setUser(this);
+        sleep(3000);
+        deadliftFinished = true;
+        deadliftEquipment.removeUser();
+        output.append("\nClient " + idNumber + " has finished deadlift training");
+    }
+    public synchronized void chalisthenicsTraining(){
+        output.append("\nClient " + idNumber + " has started chalisthenics training");
+        chalisthenicsEquipment.setUser(this);
+        sleep(3000);
+        chalisthenicsFinished = true;
+        chalisthenicsEquipment.removeUser();
+        output.append("\nClient " + idNumber + " has finished chalisthenics training");
+    }
     public synchronized void toilet() {
+
+
         output.append("\nClient " + idNumber + " is using toilet");
+        toilet.setUser(this);
+        sleep(3000);
+        toilet.removeUser();
+        output.append("\nClient " + idNumber + " has left toilet");
     }
 
     public synchronized void exit() {
@@ -253,6 +306,12 @@ public class Bodybuilder extends Thread{
                 return true;
             case CARDIO_TRAINING:
                 if(!cardioFinished) return false;
+                return true;
+            case DEADLIFT_TRAINING:
+                if(!deadliftFinished) return false;
+                return true;
+            case CHALISTHENICS_TRAINING:
+                if(!chalisthenicsFinished) return false;
                 return true;
             default:
                 return false;
