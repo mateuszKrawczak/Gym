@@ -41,5 +41,7 @@ public class Reception {
         else textArea.setText("Free");
     }
 
-
+    public int getNumberOfPeople(){
+        return people.size();
+    }
 }

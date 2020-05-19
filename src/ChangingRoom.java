@@ -23,13 +23,11 @@ public class ChangingRoom {
     public synchronized void useChangingRoom(Bodybuilder bodybuilder){
         this.people.add(bodybuilder);
         this.setTextArea();
-        System.out.println(this.people.size());
     }
 
     public synchronized void exitChangingRoom(Bodybuilder bodybuilder){
         this.people.remove(bodybuilder);
         this.setTextArea();
-        System.out.println(this.people.size());
     }
 
     public synchronized void setTextArea(){

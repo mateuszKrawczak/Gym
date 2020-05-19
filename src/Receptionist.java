@@ -17,15 +17,17 @@ public class Receptionist extends Thread {
     @Override
     public void run(){
         while(true){
-            sleep((int)(Math.random() * 1000) + 2000);
+            sleep((int)(Math.random() * 2000) + 3000);
             checkReception();
-            sleep((int)(Math.random() * 1000) + 1000);
+            sleep((int)(Math.random() * 1000) + 2000);
         }
     }
 
     public synchronized void checkReception(){
-        output.append("\n" + this + " has checked reception");
-        reception.customerService();
+        if(reception.getNumberOfPeople() > 0){
+            output.append("\n" + this + " has checked reception");
+            reception.customerService();
+        }
     }
 
     public void sleep(int timeOut) {
